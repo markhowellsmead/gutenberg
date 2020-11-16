@@ -96,32 +96,16 @@ export default function GlobalStylesProvider( {
 				set( contextSettings, path, newValue );
 				setContent( JSON.stringify( newContent ) );
 			},
-			getStyleProperty: (
-				context,
-				propertyName,
-				origin = 'merged',
-				resolveVars = true
-			) => {
+			getStyleProperty: ( context, propertyName, origin = 'merged' ) => {
 				const styles = 'user' === origin ? userStyles : mergedStyles;
 
 				const value = get(
 					styles?.[ context ]?.styles,
 					STYLE_PROPERTY[ propertyName ]
 				);
-				if ( resolveVars ) {
-					return (
-						getValueFromVariable( mergedStyles, context, value ) ||
-						value
-					);
-				}
-				return value;
+				return getValueFromVariable( mergedStyles, context, value );
 			},
-			setStyleProperty: (
-				context,
-				propertyName,
-				newValue,
-				useVars = true
-			) => {
+			setStyleProperty: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
 				let contextStyles = newContent?.[ context ]?.styles;
 				if ( ! contextStyles ) {
@@ -131,14 +115,12 @@ export default function GlobalStylesProvider( {
 				set(
 					contextStyles,
 					STYLE_PROPERTY[ propertyName ],
-					useVars
-						? getPresetVariable(
-								mergedStyles,
-								context,
-								propertyName,
-								newValue
-						  ) || newValue
-						: newValue
+					getPresetVariable(
+						mergedStyles,
+						context,
+						propertyName,
+						newValue
+					)
 				);
 				setContent( JSON.stringify( newContent ) );
 			},
