@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { set, get, mapValues, mergeWith } from 'lodash';
+import { set, get, mapValues, mergeWith, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,6 +21,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { default as getGlobalStyles } from './global-styles-renderer';
+import { PRESET_CATEGORIES } from './utils';
 
 const EMPTY_CONTENT = '{}';
 
@@ -73,6 +74,30 @@ export default function GlobalStylesProvider( {
 			newUserStyles,
 			mergeTreesCustomizer
 		);
+
+		for ( const context in newMergedStyles ) {
+			const userSettings = get( newUserStyles, [ context, 'settings' ] );
+			const baseSettings = get( baseStyles, [ context, 'settings' ] );
+			if ( ! isEmpty( userSettings ) && ! isEmpty( baseSettings ) ) {
+				for ( const presetCategory in PRESET_CATEGORIES ) {
+					const { path } = PRESET_CATEGORIES[ presetCategory ];
+					const userPreset = get( userSettings, path );
+					const basePreset = get( baseSettings, path );
+					if ( ! isEmpty( userPreset ) && ! isEmpty( basePreset ) ) {
+						const inactivePreset = get(
+							newMergedStyles,
+							[ context, 'deactivatedSettings', ...path ],
+							[]
+						);
+						set(
+							newMergedStyles,
+							[ context, 'deactivatedSettings', ...path ],
+							[ ...inactivePreset, ...basePreset ]
+						);
+					}
+				}
+			}
+		}
 
 		return {
 			userStyles: newUserStyles,
