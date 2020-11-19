@@ -210,6 +210,9 @@ function Editor() {
 												baseStyles={
 													settings.__experimentalGlobalStylesBaseStyles
 												}
+												metadata={
+													settings.__experimentalGlobalStylesMetadata
+												}
 											>
 												<KeyboardShortcuts.Register />
 												<SidebarComplementaryAreaFills />
